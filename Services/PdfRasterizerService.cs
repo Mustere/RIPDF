@@ -6,6 +6,7 @@ using Docnet.Core.Readers;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using RIPDF.Models;
+using SixLabors.ImageSharp;
 using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Jpeg;
@@ -53,7 +54,7 @@ public sealed class PdfRasterizerService
 
                 using var image = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
                 var jpegPath = Path.Combine(tempFolder, $"page_{index + 1:0000}.jpg");
-                image.Save(jpegPath, new JpegEncoder
+                image.SaveAsJpeg(jpegPath, new JpegEncoder
                 {
                     Quality = options.JpegQuality,
                     ColorType = JpegEncodingColor.YCbCrRatio420
