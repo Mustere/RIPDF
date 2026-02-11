@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using Microsoft.Win32;
@@ -120,7 +119,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         {
             await _rasterizerService.RasterizeAsync(options, statusProgress, progress, _cts.Token);
             StatusMessage = "Конвертация успешно завершена.";
-            System.Windows.MessageBox.Show(this, "Готово. PDF с JPEG-страницами создан.", "RIPDF", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, "Готово. PDF с JPEG-страницами создан.", "RIPDF", MessageBoxButton.OK, MessageBoxImage.Information);
         }
         catch (OperationCanceledException)
         {
@@ -129,7 +128,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         catch (Exception ex)
         {
             StatusMessage = "Ошибка конвертации.";
-            System.Windows.MessageBox.Show(this, ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(this, ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -142,13 +141,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(InputPath) || !File.Exists(InputPath))
         {
-            System.Windows.MessageBox.Show(this, "Укажите существующий входной PDF.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, "Укажите существующий входной PDF.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(OutputPath))
         {
-            System.Windows.MessageBox.Show(this, "Укажите путь для выходного файла.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, "Укажите путь для выходного файла.", "Валидация", MessageBoxButton.OK, MessageBoxImage.Warning);
             return false;
         }
 

@@ -1,4 +1,3 @@
-using System.IO;
 using Docnet.Core;
 using Docnet.Core.Models;
 using Docnet.Core.Readers;
