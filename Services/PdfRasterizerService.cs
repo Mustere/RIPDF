@@ -6,7 +6,6 @@ using Docnet.Core.Readers;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using RIPDF.Models;
-using SixLabors.ImageSharp;
 using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Jpeg;
