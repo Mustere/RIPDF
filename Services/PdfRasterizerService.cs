@@ -10,6 +10,7 @@ using SixLabors.ImageSharp;
 using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace RIPDF.Services;
 
@@ -53,8 +54,10 @@ public sealed class PdfRasterizerService
                 var height = pageReader.GetPageHeight();
 
                 using var image = Image.LoadPixelData<Bgra32>(rawBytes, width, height);
+                using var jpegImage = new Image<Rgb24>(width, height, SixLabors.ImageSharp.Color.White);
+                jpegImage.Mutate(ctx => ctx.DrawImage(image, 1f));
                 var jpegPath = Path.Combine(tempFolder, $"page_{index + 1:0000}.jpg");
-                image.SaveAsJpeg(jpegPath, new JpegEncoder
+                jpegImage.SaveAsJpeg(jpegPath, new JpegEncoder
                 {
                     Quality = options.JpegQuality,
                     ColorType = JpegEncodingColor.YCbCrRatio420
