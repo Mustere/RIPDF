@@ -1,10 +1,12 @@
+using System.IO;
+
 using Docnet.Core;
 using Docnet.Core.Models;
 using Docnet.Core.Readers;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using RIPDF.Models;
-using SixLabors.ImageSharp;
+using Image = SixLabors.ImageSharp.Image;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Formats.Jpeg;
 
@@ -71,11 +73,11 @@ public sealed class PdfRasterizerService
 
                 using var pageImage = XImage.FromFile(jpegPath);
                 var pdfPage = resultDocument.AddPage();
-                pdfPage.Width = pageImage.PointWidth;
-                pdfPage.Height = pageImage.PointHeight;
+                pdfPage.Width = PdfSharp.Drawing.XUnit.FromPoint(pageImage.PointWidth);
+                pdfPage.Height = PdfSharp.Drawing.XUnit.FromPoint(pageImage.PointHeight);
 
                 using var gfx = XGraphics.FromPdfPage(pdfPage);
-                gfx.DrawImage(pageImage, 0, 0, pdfPage.Width, pdfPage.Height);
+                gfx.DrawImage(pageImage, 0, 0, pdfPage.Width.Point, pdfPage.Height.Point);
             }
 
             Directory.CreateDirectory(Path.GetDirectoryName(options.OutputPath)!);
