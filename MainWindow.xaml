@@ -9,6 +9,11 @@
         Background="#0B1020">
     <Window.Resources>
         <Style x:Key="RoundedButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#7C3AED" />
+            <Setter Property="BorderBrush" Value="#A78BFA" />
+            <Setter Property="Foreground" Value="#F8FAFC" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -68,7 +73,7 @@
                             <TextBlock Text="Входной файл" FontWeight="SemiBold" Foreground="#E2E8F0" />
                             <DockPanel Margin="0,8,0,0">
                                 <TextBox Text="{Binding InputPath, UpdateSourceTrigger=PropertyChanged}" Height="38" VerticalContentAlignment="Center" />
-                                <Button Content="Обзор" Width="96" Margin="8,0,0,0" Click="SelectInputFile_OnClick" />
+                                <Button Content="Обзор" Width="96" Margin="8,0,0,0" Click="SelectInputFile_OnClick" Style="{StaticResource RoundedButtonStyle}" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
@@ -78,7 +83,7 @@
                             <TextBlock Text="Выходной файл" FontWeight="SemiBold" Foreground="#E2E8F0" />
                             <DockPanel Margin="0,8,0,0">
                                 <TextBox Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged}" Height="38" VerticalContentAlignment="Center" />
-                                <Button Content="Сохранить" Width="110" Margin="8,0,0,0" Click="SelectOutputFile_OnClick" />
+                                <Button Content="Сохранить" Width="110" Margin="8,0,0,0" Click="SelectOutputFile_OnClick" Style="{StaticResource RoundedButtonStyle}" />
                             </DockPanel>
                         </StackPanel>
                     </Border>
@@ -115,19 +120,20 @@
 
                             <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
-                                    <ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                                    <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                                    <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
+                                    <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="72" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="0" />
-                                <TextBlock Text="100" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="1" />
-                                <TextBlock Text="150" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="2" />
-                                <TextBlock Text="200" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="3" />
-                                <TextBlock Text="300" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="4" />
-                                <TextBlock Text="400" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="5" />
-                                <TextBlock Text="600" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="6" />
-                                <TextBlock Text="800" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="7" />
-                                <TextBlock Text="1000" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="8" />
-                                <TextBlock Text="1200" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" Grid.Column="9" />
+                                <TextBlock Text="72" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="0" />
+                                <TextBlock Text="100" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" />
+                                <TextBlock Text="150" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="2" />
+                                <TextBlock Text="200" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="3" />
+                                <TextBlock Text="300" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="4" />
+                                <TextBlock Text="400" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="5" />
+                                <TextBlock Text="600" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="6" />
+                                <TextBlock Text="800" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="7" />
+                                <TextBlock Text="1000" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="8" />
+                                <TextBlock Text="1200" Width="44" Margin="0,0,-22,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Right" Grid.Column="8" />
                             </Grid>
                         </StackPanel>
                     </Border>

@@ -166,127 +166,100 @@ public sealed class PdfRasterizerService
 
     private static double CalculateFillPercentageFromBytes(byte[] rawBytes, int width, int height)
     {
-        const byte whiteThreshold = 100; // Очень низкий порог для белого
-        long whitePixels = 0;
+        const byte whiteThreshold = 250;
+
         var pixelsCount = width * height;
-        
-        byte minVal = 255, maxVal = 0;
-        
-        // Проверяем разные форматы пикселей
-        // Формат 1: BGRA (4 байта на пиксель)
+        if (rawBytes.Length == 0 || pixelsCount <= 0)
+        {
+            return 0;
+        }
+
         if (rawBytes.Length >= pixelsCount * 4)
         {
-            for (var i = 0; i < rawBytes.Length - 3; i += 4)
-            {
-                var b = rawBytes[i];
-                var g = rawBytes[i + 1];
-                var r = rawBytes[i + 2];
-                
-                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
-                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
-                
-                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
-                {
-                    whitePixels++;
-                }
-            }
-            
-            var analyzedPixels = rawBytes.Length / 4;
-            if (analyzedPixels > 0)
-            {
-                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
-                var fillPercentage = 100.0 - whitePercentage;
-                
-                // Сохраним диагностику
-                System.Diagnostics.Debug.WriteLine($"BGRA Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
-                
-                return fillPercentage;
-            }
+            return CalculateBgraFillPercentage(rawBytes, pixelsCount, whiteThreshold);
         }
-        // Формат 2: RGBA (4 байта на пиксель, другой порядок)
-        else if (rawBytes.Length >= pixelsCount * 4)
+
+        if (rawBytes.Length >= pixelsCount * 3)
         {
-            for (var i = 0; i < rawBytes.Length - 3; i += 4)
-            {
-                var r = rawBytes[i];
-                var g = rawBytes[i + 1];
-                var b = rawBytes[i + 2];
-                
-                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
-                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
-                
-                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
-                {
-                    whitePixels++;
-                }
-            }
-            
-            var analyzedPixels = rawBytes.Length / 4;
-            if (analyzedPixels > 0)
-            {
-                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
-                var fillPercentage = 100.0 - whitePercentage;
-                
-                System.Diagnostics.Debug.WriteLine($"RGBA Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
-                
-                return fillPercentage;
-            }
+            return CalculateRgbFillPercentage(rawBytes, pixelsCount, whiteThreshold);
         }
-        // Формат 3: RGB (3 байта на пиксель)
-        else if (rawBytes.Length >= pixelsCount * 3)
+
+        return CalculateGrayscaleFillPercentage(rawBytes, whiteThreshold);
+    }
+
+    private static double CalculateBgraFillPercentage(byte[] rawBytes, int pixelsCount, byte whiteThreshold)
+    {
+        long filledPixels = 0;
+        var analyzedPixels = Math.Min(pixelsCount, rawBytes.Length / 4);
+
+        for (var pixel = 0; pixel < analyzedPixels; pixel++)
         {
-            for (var i = 0; i < rawBytes.Length - 2; i += 3)
+            var offset = pixel * 4;
+            var b = rawBytes[offset];
+            var g = rawBytes[offset + 1];
+            var r = rawBytes[offset + 2];
+            var a = rawBytes[offset + 3];
+
+            if (a < byte.MaxValue)
             {
-                var r = rawBytes[i];
-                var g = rawBytes[i + 1];
-                var b = rawBytes[i + 2];
-                
-                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
-                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
-                
-                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
-                {
-                    whitePixels++;
-                }
+                r = CompositeOverWhite(r, a);
+                g = CompositeOverWhite(g, a);
+                b = CompositeOverWhite(b, a);
             }
-            
-            var analyzedPixels = rawBytes.Length / 3;
-            if (analyzedPixels > 0)
+
+            if (!IsWhite(r, g, b, whiteThreshold))
             {
-                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
-                var fillPercentage = 100.0 - whitePercentage;
-                
-                System.Diagnostics.Debug.WriteLine($"RGB Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
-                
-                return fillPercentage;
-            }
-        }
-        // Формат 4: Одиночные байты (8-битный цвет)
-        else
-        {
-            for (var i = 0; i < rawBytes.Length; i++)
-            {
-                minVal = Math.Min(minVal, rawBytes[i]);
-                maxVal = Math.Max(maxVal, rawBytes[i]);
-                
-                if (rawBytes[i] >= whiteThreshold)
-                {
-                    whitePixels++;
-                }
-            }
-            
-            if (rawBytes.Length > 0)
-            {
-                var whitePercentage = (whitePixels * 100.0) / rawBytes.Length;
-                var fillPercentage = 100.0 - whitePercentage;
-                
-                System.Diagnostics.Debug.WriteLine($"8-bit Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
-                
-                return fillPercentage;
+                filledPixels++;
             }
         }
 
-        return 0;
+        return analyzedPixels == 0 ? 0 : filledPixels * 100.0 / analyzedPixels;
+    }
+
+    private static double CalculateRgbFillPercentage(byte[] rawBytes, int pixelsCount, byte whiteThreshold)
+    {
+        long filledPixels = 0;
+        var analyzedPixels = Math.Min(pixelsCount, rawBytes.Length / 3);
+
+        for (var pixel = 0; pixel < analyzedPixels; pixel++)
+        {
+            var offset = pixel * 3;
+            var r = rawBytes[offset];
+            var g = rawBytes[offset + 1];
+            var b = rawBytes[offset + 2];
+
+            if (!IsWhite(r, g, b, whiteThreshold))
+            {
+                filledPixels++;
+            }
+        }
+
+        return analyzedPixels == 0 ? 0 : filledPixels * 100.0 / analyzedPixels;
+    }
+
+    private static double CalculateGrayscaleFillPercentage(byte[] rawBytes, byte whiteThreshold)
+    {
+        long filledPixels = 0;
+
+        foreach (var value in rawBytes)
+        {
+            if (value < whiteThreshold)
+            {
+                filledPixels++;
+            }
+        }
+
+        return filledPixels * 100.0 / rawBytes.Length;
+    }
+
+    private static bool IsWhite(byte r, byte g, byte b, byte whiteThreshold)
+    {
+        return r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold;
+    }
+
+    private static byte CompositeOverWhite(byte color, byte alpha)
+    {
+        return (byte)Math.Round((color * alpha + byte.MaxValue * (byte.MaxValue - alpha)) / (double)byte.MaxValue);
     }
 
 }
