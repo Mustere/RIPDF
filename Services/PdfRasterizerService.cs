@@ -25,6 +25,16 @@ public sealed class PdfRasterizerService
         await Task.Run(() => Execute(options, status, progress, cancellationToken), cancellationToken);
     }
 
+    public async Task<Dictionary<int, double>> CheckFillAsync(
+        string pdfPath,
+        int dpi = 300,
+        IProgress<string>? status = null,
+        IProgress<double>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        return await Task.Run(() => AnalyzeFill(pdfPath, dpi, status, progress, cancellationToken), cancellationToken);
+    }
+
     private static void Execute(
         RasterizationOptions options,
         IProgress<string>? status,
@@ -111,4 +121,173 @@ public sealed class PdfRasterizerService
         var height = Math.Max(100, (int)Math.Round(heightInInches * dpi));
         return new PageDimensions(width, height);
     }
+
+    private static Dictionary<int, double> AnalyzeFill(
+        string pdfPath,
+        int dpi,
+        IProgress<string>? status,
+        IProgress<double>? progress,
+        CancellationToken cancellationToken)
+    {
+        var fillPercentages = new Dictionary<int, double>();
+        status?.Report("Анализ заливки PDF...");
+
+        try
+        {
+            var dimensions = CalculateInitialDimensions(dpi);
+            using var docReader = DocLib.Instance.GetDocReader(pdfPath, dimensions);
+            var totalPages = docReader.GetPageCount();
+
+            for (var index = 0; index < totalPages; index++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                status?.Report($"Анализ заливки страницы {index + 1}/{totalPages}...");
+
+                using var pageReader = docReader.GetPageReader(index);
+                var rawBytes = pageReader.GetImage();
+                var width = pageReader.GetPageWidth();
+                var height = pageReader.GetPageHeight();
+
+                var fillPercentage = CalculateFillPercentageFromBytes(rawBytes, width, height);
+                fillPercentages[index + 1] = fillPercentage;
+
+                progress?.Report((index + 1d) / totalPages);
+            }
+
+            status?.Report("Анализ заливки завершён.");
+        }
+        catch (Exception ex)
+        {
+            status?.Report($"Ошибка при анализе заливки: {ex.Message}");
+        }
+
+        return fillPercentages;
+    }
+
+    private static double CalculateFillPercentageFromBytes(byte[] rawBytes, int width, int height)
+    {
+        const byte whiteThreshold = 100; // Очень низкий порог для белого
+        long whitePixels = 0;
+        var pixelsCount = width * height;
+        
+        byte minVal = 255, maxVal = 0;
+        
+        // Проверяем разные форматы пикселей
+        // Формат 1: BGRA (4 байта на пиксель)
+        if (rawBytes.Length >= pixelsCount * 4)
+        {
+            for (var i = 0; i < rawBytes.Length - 3; i += 4)
+            {
+                var b = rawBytes[i];
+                var g = rawBytes[i + 1];
+                var r = rawBytes[i + 2];
+                
+                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
+                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
+                
+                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
+                {
+                    whitePixels++;
+                }
+            }
+            
+            var analyzedPixels = rawBytes.Length / 4;
+            if (analyzedPixels > 0)
+            {
+                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
+                var fillPercentage = 100.0 - whitePercentage;
+                
+                // Сохраним диагностику
+                System.Diagnostics.Debug.WriteLine($"BGRA Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
+                
+                return fillPercentage;
+            }
+        }
+        // Формат 2: RGBA (4 байта на пиксель, другой порядок)
+        else if (rawBytes.Length >= pixelsCount * 4)
+        {
+            for (var i = 0; i < rawBytes.Length - 3; i += 4)
+            {
+                var r = rawBytes[i];
+                var g = rawBytes[i + 1];
+                var b = rawBytes[i + 2];
+                
+                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
+                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
+                
+                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
+                {
+                    whitePixels++;
+                }
+            }
+            
+            var analyzedPixels = rawBytes.Length / 4;
+            if (analyzedPixels > 0)
+            {
+                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
+                var fillPercentage = 100.0 - whitePercentage;
+                
+                System.Diagnostics.Debug.WriteLine($"RGBA Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
+                
+                return fillPercentage;
+            }
+        }
+        // Формат 3: RGB (3 байта на пиксель)
+        else if (rawBytes.Length >= pixelsCount * 3)
+        {
+            for (var i = 0; i < rawBytes.Length - 2; i += 3)
+            {
+                var r = rawBytes[i];
+                var g = rawBytes[i + 1];
+                var b = rawBytes[i + 2];
+                
+                minVal = Math.Min(minVal, Math.Min(r, Math.Min(g, b)));
+                maxVal = Math.Max(maxVal, Math.Max(r, Math.Max(g, b)));
+                
+                if (r >= whiteThreshold && g >= whiteThreshold && b >= whiteThreshold)
+                {
+                    whitePixels++;
+                }
+            }
+            
+            var analyzedPixels = rawBytes.Length / 3;
+            if (analyzedPixels > 0)
+            {
+                var whitePercentage = (whitePixels * 100.0) / analyzedPixels;
+                var fillPercentage = 100.0 - whitePercentage;
+                
+                System.Diagnostics.Debug.WriteLine($"RGB Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
+                
+                return fillPercentage;
+            }
+        }
+        // Формат 4: Одиночные байты (8-битный цвет)
+        else
+        {
+            for (var i = 0; i < rawBytes.Length; i++)
+            {
+                minVal = Math.Min(minVal, rawBytes[i]);
+                maxVal = Math.Max(maxVal, rawBytes[i]);
+                
+                if (rawBytes[i] >= whiteThreshold)
+                {
+                    whitePixels++;
+                }
+            }
+            
+            if (rawBytes.Length > 0)
+            {
+                var whitePercentage = (whitePixels * 100.0) / rawBytes.Length;
+                var fillPercentage = 100.0 - whitePercentage;
+                
+                System.Diagnostics.Debug.WriteLine($"8-bit Format: Min={minVal}, Max={maxVal}, White%={whitePercentage:F2}%, Fill%={fillPercentage:F2}%");
+                
+                return fillPercentage;
+            }
+        }
+
+        return 0;
+    }
+
 }
+
