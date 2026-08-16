@@ -124,16 +124,16 @@
                                     <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
                                     <ColumnDefinition /><ColumnDefinition /><ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="72" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="0" />
-                                <TextBlock Text="100" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="1" />
-                                <TextBlock Text="150" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="2" />
-                                <TextBlock Text="200" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="3" />
-                                <TextBlock Text="300" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="4" />
-                                <TextBlock Text="400" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="5" />
-                                <TextBlock Text="600" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="6" />
-                                <TextBlock Text="800" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="7" />
-                                <TextBlock Text="1000" Width="44" Margin="-22,0,0,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Left" Grid.Column="8" />
-                                <TextBlock Text="1200" Width="44" Margin="0,0,-22,0" Foreground="#7C8CB8" FontSize="11" TextAlignment="Center" HorizontalAlignment="Right" Grid.Column="8" />
+                                <TextBlock Text="72" Width="44" Margin="-20,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="0" />
+                                <TextBlock Text="100" Width="44" Margin="-30,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="1" />
+                                <TextBlock Text="150" Width="44" Margin="-30,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="2" />
+                                <TextBlock Text="200" Width="44" Margin="-35,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="3" />
+                                <TextBlock Text="300" Width="44" Margin="-35,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="4" />
+                                <TextBlock Text="400" Width="44" Margin="-35,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="5" />
+                                <TextBlock Text="600" Width="44" Margin="-40,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="6" />
+                                <TextBlock Text="800" Width="44" Margin="-40,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="7" />
+                                <TextBlock Text="1000" Width="44" Margin="-50,0,0,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Center" Grid.Column="8" />
+                                <TextBlock Text="1200" Width="44" Margin="0,0,-24,0" Foreground="#7C8CB8" FontSize="11" HorizontalAlignment="Right" Grid.Column="9" />
                             </Grid>
                         </StackPanel>
                     </Border>
