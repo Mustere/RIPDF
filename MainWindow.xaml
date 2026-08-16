@@ -9,6 +9,11 @@
         Background="#0B1020">
     <Window.Resources>
         <Style x:Key="RoundedButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#7C3AED" />
+            <Setter Property="BorderBrush" Value="#A78BFA" />
+            <Setter Property="Foreground" Value="#F8FAFC" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
